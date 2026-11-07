@@ -36,6 +36,7 @@
         div.movie div.title {text-align: center; overflow: hidden; text-overflow: ellipsis; width: 200px; white-space: nowrap; margin-top: 8px;}
         div.field {color: var(--primary); text-transform: uppercase; font-size: 12px;}
 
+        /* Detail Card Sizing */
         .movie-detail-card {
             background: white;
             padding: 20px;
@@ -65,32 +66,17 @@
 
     <script type="text/javascript">
 
+       // DATA MODEL
+
        let initial_movies = [
-        { 
-            title: "Superlópez", 
-            director: "Javier Ruiz Caldera", 
-            thumbnail: "Superlópez info", 
-            additionalInfo: "Un superhéroe español atípico basado en el famoso cómic de Jan.", 
-            picture: "files/superlopez.png" 
-        },
-        { 
-            title: "Jurassic Park", 
-            director: "Steven Spielberg", 
-            thumbnail: "Jurassic Park info", 
-            additionalInfo: "Un parque temático de dinosaurios clonados sale desastrosamente de control.", 
-            picture: "files/jurassicpark.png" 
-        },
-        { 
-            title: "Interstellar", 
-            director: "Christopher Nolan", 
-            thumbnail: "Interstellar info", 
-            additionalInfo: "Un equipo de exploradores viaja a través de un agujero de gusano en busca de un nuevo hogar para la humanidad.", 
-            picture: "files/interstellar.png" 
-        }
+        { title: "Superlópez", director: "Javier Ruiz Caldera", thumbnail: "files/superlopez.png" },
+        { title: "Jurassic Park", director: "Steven Spielberg", thumbnail: "files/jurassicpark.png" },
+        { title: "Interstellar", director: "Christopher Nolan", thumbnail: "files/interstellar.png" }
     ];
 
         localStorage.my_movies = localStorage.my_movies || JSON.stringify(initial_movies);
 
+        // VIEWS
         const indexView = (movies) => {
             let i=0;
             let view = "";
@@ -99,25 +85,25 @@
               view += `
                 <div class="movie">
                    <div class="movie-img">
-                        <img data-my-id="${i}" src="${movies[i].picture || movies[i].thumbnail}" onerror="this.src='files/noimage.png'"/>
+                        <img data-my-id="${i}" class="show" src="${movies[i].thumbnail}" onerror="this.src='files/noimage.png'"/>
                    </div>
                    <div class="title">
-                       ${movies[i].title || "<em>No title</em>"}
+                        ${movies[i].title || "<em>No title</em>"}
                    </div>
                    <div class="actions">
-                        <button class="show" data-my-id="${i}">View</button>
-                        <button class="edit" data-my-id="${i}">edit</button>
-                        <button class="delete" data-my-id="${i}">delete</button>
+                        <button class="show" data-my-id="${i}">Show</button>
+                        <button class="edit" data-my-id="${i}">Edit</button>
+                        <button class="delete" data-my-id="${i}">Delete</button>
                    </div>
                 </div>\n`;
               i = i + 1;
             };
 
             view += `<div class="actions">
-                <button class="new">Add Movie</button>
-                <button class="reset">Reset</button>
-                <button class="search-menu">Search API</button>
-            </div>`;
+                        <button class="new">Add Movie</button>
+                        <button class="reset">Reset</button>
+                        <button class="search-menu">Search API</button>
+                    </div>`;
 
             return view;
         };
@@ -126,31 +112,19 @@
             return `<h2>Edit Movie </h2>
                 <div class="field">
                 Title <br>
-                <input type="text" id="title" placeholder="Title" value="${movie.title || ''}">
+                <input type="text" id="title" placeholder="Title" value="${movie.title}">
                 </div>
                 <div class="field">
                 Director <br>
-                <input type="text" id="director" placeholder="Director" value="${movie.director || ''}">
+                <input type="text" id="director" placeholder="Director" value="${movie.director}">
                 </div>
                 <div class="field">
                 Thumbnail <br>
-                <input type="text" id="thumbnail" placeholder="Thumbnail info" value="${movie.thumbnail || ''}">
-                </div>
-                <div class="field">
-                Additional Info <br>
-                <input type="text" id="additionalInfo" placeholder="Phrase about the film" value="${movie.additionalInfo || ''}">
-                </div>
-                <div class="field">
-                Picture <br>
-                <input type="file" id="picture" accept="image/*">
+                <input type="text" id="thumbnail" placeholder="Thumbnail URL" value="${movie.thumbnail}">
                 </div>
                 <div class="actions">
-                    <button class="update" data-my-id="${i}">
-                        Update
-                    </button>
-                    <button class="index">
-                        Back
-                    </button>
+                    <button class="update" data-my-id="${i}">Update</button>
+                    <button class="index">Back</button>
                 </div>`;
         }
 
@@ -158,7 +132,7 @@
             return `
             <div class="movie-detail-card">
                 <div class="movie-detail-img">
-                    <img src="${movie.picture || movie.thumbnail}" onerror="this.src='files/noimage.png'" alt="${movie.title}">
+                    <img src="${movie.thumbnail}" onerror="this.src='files/noimage.png'" alt="${movie.title}">
                 </div>
                 <div class="movie-detail-info">
                     <h2>${movie.title || "<em>No title</em>"}</h2>
@@ -166,11 +140,8 @@
                     <div class="field">Director</div>
                     <div class="field-value">${movie.director || "<em>No director</em>"}</div>
                     
-                    <div class="field">Thumbnail</div>
+                    <div class="field">Thumbnail URL</div>
                     <div class="field-value">${movie.thumbnail || "<em>No thumbnail</em>"}</div>
-
-                    <div class="field">Additional Info</div>
-                    <div class="field-value">${movie.additionalInfo || "<em>No additional info</em>"}</div>
 
                     <div class="actions">
                         <button class="index">Back</button>
@@ -191,15 +162,7 @@
                 </div>
                 <div class="field">
                 Thumbnail <br>
-                <input type="text" id="thumbnail" placeholder="Thumbnail info">
-                </div>
-                <div class="field">
-                Additional Info <br>
-                <input type="text" id="additionalInfo" placeholder="Phrase about the film">
-                </div>
-                <div class="field">
-                Picture <br>
-                <input type="file" id="picture" accept="image/*">
+                <input type="text" id="thumbnail" placeholder="Thumbnail URL">
                 </div>
                 <div class="actions">
                     <button class="create">Create</button>
@@ -238,15 +201,15 @@
                 let posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : 'files/noimage.png';
                 view += `
                     <div class="movie">
-                       <div class="movie-img">
-                            <img src="${posterUrl}" onerror="this.src='files/noimage.png'"/>
-                       </div>
-                       <div class="title">
-                           ${movie.title || "<em>No title</em>"}
-                       </div>
-                       <div class="actions">
-                            <button class="add-api" data-api-id="${i}">Add to Local</button>
-                        </div>
+                         <div class="movie-img">
+                              <img src="${posterUrl}" onerror="this.src='files/noimage.png'"/>
+                         </div>
+                         <div class="title">
+                              ${movie.title || "<em>No title</em>"}
+                         </div>
+                         <div class="actions">
+                              <button class="add-api" data-api-id="${i}">Add to Local</button>
+                         </div>
                     </div>`;
                 i++;
             }
@@ -255,10 +218,7 @@
             return view;
         };
 
-        const searchMenuContr = () => {
-            document.getElementById('main').innerHTML = searchView();
-        };
-
+        // CONTROLLERS 
         const indexContr = () => {
          let my_movies = JSON.parse(localStorage.my_movies);
          document.getElementById('main').innerHTML = indexView(my_movies);
@@ -274,35 +234,24 @@
         };
 
         const createContr = () => {
-            let my_movies = JSON.parse(localStorage.my_movies);
-            let title = document.getElementById('title').value;
-            let director = document.getElementById('director').value;
-            let thumbnail = document.getElementById('thumbnail').value;
-            let additionalInfo = document.getElementById('additionalInfo').value;
-            let fileInput = document.getElementById('picture');
+            let title = document.getElementById('title').value.trim();
+            let director = document.getElementById('director').value.trim();
+            let thumbnail = document.getElementById('thumbnail').value.trim();
 
-            let saveMovie = (pictureUrl) => {
-                let newMovie = {
-                    title: title,
-                    director: director,
-                    thumbnail: thumbnail,
-                    additionalInfo: additionalInfo,
-                    picture: pictureUrl || "files/noimage.png"
-                };
-                my_movies.push(newMovie);
-                localStorage.my_movies = JSON.stringify(my_movies);
-                indexContr();
-            };
-
-            if (fileInput.files && fileInput.files[0]) {
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    saveMovie(e.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                saveMovie();
+            if (!title && !director && !thumbnail) {
+                alert("Please fill in at least one field to create a movie.");
+                return;
             }
+
+            let my_movies = JSON.parse(localStorage.my_movies);
+            let newMovie = {
+                title: title,
+                director: director,
+                thumbnail: thumbnail
+            };
+            my_movies.push(newMovie);
+            localStorage.my_movies = JSON.stringify(my_movies);
+            indexContr();
         };
 
         const editContr = (i) => {
@@ -312,33 +261,11 @@
 
         const updateContr = (i) => {
             let my_movies = JSON.parse(localStorage.my_movies);
-            let title = document.getElementById('title').value;
-            let director = document.getElementById('director').value;
-            let thumbnail = document.getElementById('thumbnail').value;
-            let additionalInfo = document.getElementById('additionalInfo').value;
-            let fileInput = document.getElementById('picture');
-
-            let updateMovie = (pictureUrl) => {
-                my_movies[i].title = title;
-                my_movies[i].director = director;
-                my_movies[i].thumbnail = thumbnail;
-                my_movies[i].additionalInfo = additionalInfo;
-                if (pictureUrl) {
-                    my_movies[i].picture = pictureUrl;
-                }
-                localStorage.my_movies = JSON.stringify(my_movies);
-                indexContr();
-            };
-
-            if (fileInput.files && fileInput.files[0]) {
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    updateMovie(e.target.result);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                updateMovie();
-            }
+            my_movies[i].title    = document.getElementById('title').value;
+            my_movies[i].director  = document.getElementById('director').value;
+            my_movies[i].thumbnail = document.getElementById('thumbnail').value;
+            localStorage.my_movies = JSON.stringify(my_movies);
+            indexContr();
         };
 
         const deleteContr = (i) => {
@@ -355,7 +282,10 @@
             indexContr();
         };
 
-        
+        const searchMenuContr = () => {
+            document.getElementById('main').innerHTML = searchView();
+        };
+
         const searchContr = (query) => {
             if (query === undefined) {
                 let queryField = document.getElementById('search_query');
@@ -424,9 +354,7 @@
                     let newMovie = {
                         title: details.title || selectedMovie.title || "No Title",
                         director: director,
-                        thumbnail: "TMDb Poster",
-                        additionalInfo: details.overview || selectedMovie.overview || "No additional info available.",
-                        picture: posterUrl
+                        thumbnail: posterUrl
                     };
 
                     let my_movies = JSON.parse(localStorage.my_movies);
@@ -448,9 +376,7 @@
                     let newMovie = {
                         title: selectedMovie.title || "No Title",
                         director: "TMDb Import",
-                        thumbnail: "TMDb Poster",
-                        additionalInfo: selectedMovie.overview || "No additional info available.",
-                        picture: selectedMovie.poster_path ? `https://image.tmdb.org/t/p/w200${selectedMovie.poster_path}` : "files/noimage.png"
+                        thumbnail: selectedMovie.poster_path ? `https://image.tmdb.org/t/p/w200${selectedMovie.poster_path}` : "files/noimage.png"
                     };
 
                     let my_movies = JSON.parse(localStorage.my_movies);
@@ -467,13 +393,14 @@
                     indexContr();
                 });
         };
-        
+
+        // EVENT ROUTER
         const matchEvent = (ev, sel) => ev.target.matches(sel);
         const myId = (ev) => Number(ev.target.dataset.myId);
         const apiId = (ev) => Number(ev.target.dataset.apiId);
 
         document.addEventListener('click', ev => {
-            if      (matchEvent(ev, '.index')) indexContr  ();
+            if      (matchEvent(ev, '.index'))  indexContr  ();
             else if (matchEvent(ev, '.edit'))   editContr   (myId(ev));
             else if (matchEvent(ev, '.update')) updateContr (myId(ev));
             else if (matchEvent(ev, '.show'))   showContr   (myId(ev));
@@ -483,9 +410,10 @@
             else if (matchEvent(ev, '.reset'))  resetContr  ();
             else if (matchEvent(ev, '.search-menu')) searchMenuContr ();
             else if (matchEvent(ev, '.search-submit')) searchContr ();
-            else if (matchEvent(ev, '.add-api'))        addFromAPIContr (apiId(ev));
+            else if (matchEvent(ev, '.add-api')) addFromAPIContr (apiId(ev));
         })
 
+        // Initialization        
         document.addEventListener('DOMContentLoaded', indexContr);
     </script>
 </head>
